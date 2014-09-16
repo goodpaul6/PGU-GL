@@ -1,11 +1,14 @@
 package com.ngsarmy.pgu.core;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.openal.SoundStore;
+
+import com.ngsarmy.pgu.graphics.PguImage;
 
 /* PguGame class:
  * This is the class where
@@ -19,16 +22,12 @@ import org.newdawn.slick.openal.SoundStore;
  */
 public class PguGame 
 {
-	public static final int WIDTH = 480 * 2; 
-	public static final int HEIGHT = 240 * 2;
+	public static final int WIDTH = 480; 
+	public static final int HEIGHT = 240;
+	public static final int SCALE = 2;
 	
-	// Game globals
-	public static PguColor bgColor = new PguColor();
-	public static float volume = 1.0f;
-	public static float elapsed = 0;
-	// end of game globals
-	
-	private float rotation = 0;
+	private PguImage graphic;
+	private PguPoint camera;
 	
 	public PguGame()
 	{
@@ -38,7 +37,7 @@ public class PguGame
 	{
 		try
 		{
-			Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));
+			Display.setDisplayMode(new DisplayMode(WIDTH * SCALE, HEIGHT * SCALE));
 			Display.create();
 		}
 		catch(LWJGLException e)
@@ -62,12 +61,17 @@ public class PguGame
 		long frames = 0;
 		long timer = System.currentTimeMillis();
 		
+		graphic = new PguImage("PGULogo.png", new PguRectangle(0, 0, 32, 42));
+		graphic.originX = graphic.getWidth() / 2;
+		
+		camera = new PguPoint(0, 0);
+		
 		while(!Display.isCloseRequested())
 		{
 			delta = System.nanoTime() - lastTime;
 			lastTime = System.nanoTime();
 			
-			elapsed = PguUtils.nanoToSeconds(delta);
+			PguG.elapsed = PguUtils.nanoToSeconds(delta);
 			
 			update();
 			render();
@@ -91,35 +95,30 @@ public class PguGame
 	
 	public void update()
 	{
-		rotation += 50 * elapsed;
+		rotation += 100 * PguG.elapsed;
+		graphic.angle = rotation;
+		
+		if(Keyboard.isKeyDown(Keyboard.KEY_A))
+			camera.x -= 200 * PguG.elapsed;
+		
+		if(Keyboard.isKeyDown(Keyboard.KEY_D))
+			camera.x += 200 * PguG.elapsed;
+		
+		if(Keyboard.isKeyDown(Keyboard.KEY_W))
+			camera.y -= 200 * PguG.elapsed;
+		
+		if(Keyboard.isKeyDown(Keyboard.KEY_S))
+			camera.y += 200 * PguG.elapsed;
 	}
 	
 	public void render()
 	{
-		GL11.glClearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
+		GL11.glClearColor(PguG.bgColor.fR(), PguG.bgColor.fG(), PguG.bgColor.fB(), PguG.bgColor.fA());
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 		
-		GL11.glLoadIdentity();
-		
-		PguTexture.fromFile("PGULogo.png").bind();
-		
-		GL11.glScalef(2, 2, 1);
-		GL11.glRotatef(rotation, 0, 0, 1);
-		
-		GL11.glBegin(GL11.GL_TRIANGLES);
-		GL11.glTexCoord2f(0, 0);
-		GL11.glVertex2f(0, 0);
-		GL11.glTexCoord2f(1, 0);
-		GL11.glVertex2f(100, 0);
-		GL11.glTexCoord2f(1, 1);
-		GL11.glVertex2f(100, 100);
-		GL11.glTexCoord2f(0, 0);
-		GL11.glVertex2f(0, 0);
-		GL11.glTexCoord2f(1, 1);
-		GL11.glVertex2f(100, 100);
-		GL11.glTexCoord2f(0, 1);
-		GL11.glVertex2f(0, 100);
-		GL11.glEnd();
+		PguPoint p = PguPoint.get(100, 100);
+		graphic.render(p, camera);
+		PguPoint.dispose(p);
 	}
 	
 	// MAIN METHOD:

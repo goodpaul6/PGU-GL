@@ -24,8 +24,8 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 public class PguSound 
 {	
-	private static PguHashMap<String, PguSound> cache = new PguHashMap<String, PguSound>();
-	private Audio aud;
+	private static PguHashMap<String, PguSound> _cache = new PguHashMap<String, PguSound>();
+	private Audio _aud;
 	
 	public static PguSound fromFile(String path)
 	{
@@ -35,7 +35,7 @@ public class PguSound
 		{
 			Audio slickAud = AudioLoader.getAudio(path.substring(dotPos + 1).toUpperCase(), ResourceLoader.getResourceAsStream("res/" + path));
 			aud = new PguSound(slickAud);
-			cache.put(path, aud);
+			_cache.put(path, aud);
 			return aud;
 		}
 		catch(IOException e)
@@ -47,12 +47,12 @@ public class PguSound
 	
 	public PguSound(Audio aud)
 	{
-		this.aud = aud;
+		_aud = aud;
 	}
 	
 	public void play(float pitch, float gain, boolean loop)
 	{
-		aud.playAsSoundEffect(pitch, gain * PguGame.volume, loop);
+		_aud.playAsSoundEffect(pitch, gain * PguG.volume, loop);
 	}
 	
 	public void play()

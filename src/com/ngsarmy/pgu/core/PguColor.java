@@ -6,12 +6,12 @@ package com.ngsarmy.pgu.core;
  * r, g, b, and a
  * values for rendering.
  * The values are from 0 
- * to 1, 0 being darkest
- * and 1 being lightest.
+ * to 255, 0 being darkest
+ * and 255 being lightest.
  */
 public class PguColor 
 {
-	float r, g, b, a;
+	int r, g, b, a;
 	
 	public PguColor()
 	{
@@ -21,7 +21,7 @@ public class PguColor
 		a = 0;
 	}
 	
-	public PguColor(float r, float g, float b, float a)
+	public PguColor(int r, int g, int b, int a)
 	{
 		this.r = r;
 		this.g = g;
@@ -29,11 +29,38 @@ public class PguColor
 		this.a = a;
 	}
 	
-	public PguColor(int r, int g, int b, int a)
+	// USAGE:
+	// convert from PguColor to AARRGGBB hex integer
+	public int toHexARGB()
 	{
-		this.r = (float)r / 255;
-		this.g = (float)g / 255;
-		this.b = (float)b / 255;
-		this.a = (float)a / 255;
+		return ((a << 24) & 0xFF) | ((r << 16) & 0xFF) | ((g << 8) & 0xFF) | (b & 0xFF);
+	}
+	
+	// USAGE:
+	// get float r value (0 - 1)
+	public float fR()
+	{
+		return (r / 255.0f);
+	}
+	
+	// USAGE:
+	// get float g value (0 - 1)
+	public float fG()
+	{
+		return (g / 255.0f);
+	}
+	
+	// USAGE:
+	// get float g value (0 - 1)
+	public float fB()
+	{
+		return (b / 255.0f);
+	}
+	
+	// USAGE:
+	// get float a value (0 - 1)
+	public float fA()
+	{
+		return (a / 255.0f);
 	}
 }

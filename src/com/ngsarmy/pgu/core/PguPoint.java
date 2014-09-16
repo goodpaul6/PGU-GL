@@ -15,16 +15,22 @@ package com.ngsarmy.pgu.core;
 public class PguPoint 
 {
 	// internal pool
-	private static PguPool<PguPoint> pool = new PguPool<PguPoint>();
+	private static PguPool<PguPoint> _pool = new PguPool<PguPoint>();
 	
+	// USAGE:
+	// returns a *POOL-ALLOCATED* PguPoint with the given x and y coords
+	// NOTE: Remeber to call PguPoint.dispose on pool allocated points
 	public static PguPoint get(float x, float y)
 	{
-		if(pool.size() > 0)
-			return pool.pop().set(x, y);
+		if(_pool.size() > 0)
+			return _pool.pop().set(x, y);
 		
 		return new PguPoint(0, 0);
 	}
 	
+	// USAGE:
+	// returns a *POOL-ALLOCATED* PguPoint with x = 0 and y = 0
+	// NOTE: Remeber to call PguPoint.dispose on pool allocated points
 	public static PguPoint get()
 	{
 		return get(0, 0);
@@ -140,6 +146,6 @@ public class PguPoint
 	
 	public static void dispose(PguPoint p)
 	{
-		pool.push(p);
+		_pool.push(p);
 	}
 }

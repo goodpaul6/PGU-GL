@@ -26,8 +26,13 @@ import org.newdawn.slick.util.ResourceLoader;
  * yourself.
  */
 public class PguTexture 
-{
-	private static PguHashMap<String, PguTexture> cache = new PguHashMap<String, PguTexture>();
+{	
+	// nearest neighbor filter: pixel-y
+	public static final int NEAREST = GL11.GL_NEAREST;
+	// normal linear filter: slower but cleaner, a little blurry
+	public static final int BILINEAR = GL11.GL_LINEAR;
+	
+	private static PguHashMap<String, PguTexture> _cache = new PguHashMap<String, PguTexture>();
 	
 	public static PguTexture fromFile(String path)
 	{
@@ -36,8 +41,9 @@ public class PguTexture
 		try
 		{
 			Texture slickTex = TextureLoader.getTexture(path.substring(dotPos + 1).toUpperCase(), ResourceLoader.getResourceAsStream("res/" + path));
+			slickTex.setTextureFilter(PguG.defaultTextureBlendingMode);
 			texture = new PguTexture(slickTex.getTextureID(), slickTex.getImageWidth(), slickTex.getImageHeight());
-			cache.put(path, texture);
+			_cache.put(path, texture);
 			return texture;
 		}
 		catch(IOException e)

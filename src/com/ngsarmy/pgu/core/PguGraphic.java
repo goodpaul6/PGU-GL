@@ -34,7 +34,7 @@ public abstract class PguGraphic
 	
 	public PguGraphic()
 	{
-		active = false;
+		active = true;
 		visible = true;
 		x = y = 0;
 		scrollX = scrollY = 1;

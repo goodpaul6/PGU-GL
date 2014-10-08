@@ -1,14 +1,16 @@
 package com.ngsarmy.pgu.core;
 
+import java.util.ArrayList;
+import java.util.Stack;
+
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.openal.SoundStore;
 
-import com.ngsarmy.pgu.graphics.PguImage;
+import com.ngsarmy.pgu.template.GameScene;
+import com.ngsarmy.pgu.utils.PguInput;
 
 /* PguGame class:
  * This is the class where
@@ -22,22 +24,22 @@ import com.ngsarmy.pgu.graphics.PguImage;
  */
 public class PguGame 
 {
-	public static final int WIDTH = 480; 
-	public static final int HEIGHT = 240;
-	public static final int SCALE = 2;
+	// whether the game is FULLY paused (no processing at all)
+	private boolean _paused;
 	
-	private PguImage graphic;
-	private PguPoint camera;
+	// the scene stack
+	private Stack<PguScene> _scenes;
+	
+	// scenes to be added and removed, respectively
+	private ArrayList<PguScene> _add;
+	private ArrayList<PguScene> _remove;
 	
 	public PguGame()
 	{
-	}
-	
-	public void run()
-	{
 		try
 		{
-			Display.setDisplayMode(new DisplayMode(WIDTH * SCALE, HEIGHT * SCALE));
+			Display.setDisplayMode(new DisplayMode((int)(PguG.width * PguG.scale), (int)(PguG.height * PguG.scale)));
+			Display.setVSyncEnabled(PguG.ENABLE_VSYNC);
 			Display.create();
 		}
 		catch(LWJGLException e)
@@ -46,13 +48,24 @@ public class PguGame
 			System.exit(1);
 		}
 		
+		_scenes = new Stack<PguScene>();
+		_add = new ArrayList<PguScene>();
+		_remove = new ArrayList<PguScene>();
+	}
+	
+	public void run()
+	{
+		_paused = false;
+		
+		PguG.game = this;
+		
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
 		GL11.glLoadIdentity();
-		GL11.glOrtho(0, WIDTH, HEIGHT, 0, 1, -1);
+		GL11.glOrtho(0, PguG.width, PguG.height, 0, 1, -1);
 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
 		
 		long lastTime = System.nanoTime();
@@ -60,12 +73,7 @@ public class PguGame
 		
 		long frames = 0;
 		long timer = System.currentTimeMillis();
-		
-		graphic = new PguImage("PGULogo.png", new PguRectangle(0, 0, 32, 42));
-		graphic.originX = graphic.getWidth() / 2;
-		
-		camera = new PguPoint(0, 0);
-		
+
 		while(!Display.isCloseRequested())
 		{
 			delta = System.nanoTime() - lastTime;
@@ -73,9 +81,13 @@ public class PguGame
 			
 			PguG.elapsed = PguUtils.nanoToSeconds(delta);
 			
-			update();
-			render();
-
+			if(!_paused)
+			{
+				PguInput.update();
+				update();
+				render();
+			}
+			
 			SoundStore.get().poll(0);
 			
 			++frames;
@@ -90,35 +102,90 @@ public class PguGame
 		}
 		
 		Display.destroy();
-		AL.destroy();
 	}
 	
-	public void update()
+	private void update()
 	{
-		rotation += 100 * PguG.elapsed;
-		graphic.angle = rotation;
+		applyChanges();
 		
-		if(Keyboard.isKeyDown(Keyboard.KEY_A))
-			camera.x -= 200 * PguG.elapsed;
-		
-		if(Keyboard.isKeyDown(Keyboard.KEY_D))
-			camera.x += 200 * PguG.elapsed;
-		
-		if(Keyboard.isKeyDown(Keyboard.KEY_W))
-			camera.y -= 200 * PguG.elapsed;
-		
-		if(Keyboard.isKeyDown(Keyboard.KEY_S))
-			camera.y += 200 * PguG.elapsed;
+		for(int i = 0; i < _scenes.size(); i++)
+		{
+			PguScene scene = _scenes.get(i);
+			scene.applyChanges();
+			if(!scene.update()) break;
+		}
 	}
 	
-	public void render()
+	private void render()
 	{
 		GL11.glClearColor(PguG.bgColor.fR(), PguG.bgColor.fG(), PguG.bgColor.fB(), PguG.bgColor.fA());
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 		
-		PguPoint p = PguPoint.get(100, 100);
-		graphic.render(p, camera);
-		PguPoint.dispose(p);
+		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		
+		applyChanges();
+		
+		for(int i = 0; i < _scenes.size(); i++)
+		{
+			PguScene scene = _scenes.get(i);
+			scene.applyChanges();
+			if(!scene.render()) break;
+		}
+		
+		GL11.glFlush();
+	}
+	
+	private void applyChanges()
+	{	
+		for(int i = 0; i < _add.size(); i++)
+		{
+			PguScene s = _add.get(i);
+			_scenes.add(s);
+			PguG.scene = s;
+			s.begin();
+		}
+		_add.clear();
+		
+		for(int i = 0; i < _remove.size(); i++)
+		{
+			PguScene s = _remove.get(i);
+			_scenes.remove(_remove.get(i));
+			PguG.scene = null;
+			s.end();
+		}
+		_remove.clear();
+		
+		if(_scenes.size() > 0)
+			PguG.scene = _scenes.lastElement();
+		else
+			PguG.scene = null;
+	}
+	
+	// USAGE:
+	// pushes a scene onto the scene stack (overlays a scene)
+	// this does not remove the previous scene, if you want to do that, use transScene
+	// scene -> the scene to push onto the stack
+	public void pushScene(PguScene scene)
+	{
+		_add.add(scene);
+	}
+	
+	// USAGE:
+	// pops a scene off the scene stack if there is one (removes the current scene)
+	// this does not push a new scene onto the stack, if you want to do that, use transScene
+	public void popScene()
+	{
+		if(_scenes.size() > 0)
+			_remove.add(_scenes.lastElement());
+	}
+	
+	// USAGE:
+	// pops the current scene off the stack and pushes a new one
+	// scene -> the scene to push after popping the current
+	public void transScene(PguScene scene)
+	{
+		popScene();
+		pushScene(scene);
 	}
 	
 	// MAIN METHOD:
@@ -126,6 +193,7 @@ public class PguGame
 	public static void main(String[] args)
 	{
 		PguGame game = new PguGame();
+		game.pushScene(new GameScene());
 		game.run();
 	}
 }

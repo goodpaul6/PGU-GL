@@ -44,11 +44,25 @@ public class PguPoint
 		x = 0;
 		y = 0;
 	}
-	
+
 	public PguPoint(float x, float y)
 	{
 		this.x = x;
 		this.y = y;
+	}
+	
+	// USAGE:
+	// returns a copy of this point (recommended if you plan on editing it's value
+	public PguPoint cpy()
+	{
+		return new PguPoint(x, y);
+	}
+	
+	// USAGE:
+	// returns a WEAK copy of this point (you must dispose of it as soon as you're done with it)
+	public PguPoint weakCpy()
+	{
+		return PguPoint.get(x, y);
 	}
 	
 	public PguPoint set(float x, float y)

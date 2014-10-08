@@ -29,6 +29,8 @@ public class PguSound
 	
 	public static PguSound fromFile(String path)
 	{
+		if(_cache.containsKey(path)) return _cache.get(path);
+		
 		int dotPos = path.lastIndexOf('.');
 		PguSound aud;
 		try

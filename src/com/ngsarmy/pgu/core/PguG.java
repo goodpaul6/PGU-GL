@@ -1,5 +1,7 @@
 package com.ngsarmy.pgu.core;
 
+import com.ngsarmy.pgu.graphics.PguText;
+
 /* PguG class:
  * stores global values
  * and methods (but this is
@@ -10,16 +12,58 @@ package com.ngsarmy.pgu.core;
  */
 public class PguG 
 {
+	// the game engine host
+	public static PguGame game;
 	// width of the viewport
-	public static int width = PguGame.WIDTH;
+	public static int width = 480;
 	// height of the viewport
-	public static int height = PguGame.HEIGHT;
+	public static int height = 240;
+	// scale of the viewport
+	public static float scale = 2;
 	// background color
 	public static PguColor bgColor = new PguColor();
-	// volume
+	// volume (this affects the volume of both music and sound effects)
 	public static float volume = 1.0f;
 	// delta time
 	public static float elapsed = 0;
 	// default texture blending mode: change this as needed
-	public static final int defaultTextureBlendingMode = PguTexture.NEAREST;
+	public static final int DEFAULT_TEXTURE_BLENDING_MODE = PguTexture.NEAREST;
+	// whether or not the text should be smoothened out (bad for pixel-y games)
+	public static final boolean ANTIALIAS_TEXT = false;
+	// whether this program's framerate should sync with the screen's framerate
+	public static final boolean ENABLE_VSYNC = false;
+	// the sample amount for the collision detection (the higher this value, the slower the game, but the better the collision detection)
+	public static int entityCollisionSampleAmount = 2;
+	// current game scene (CAN BE null)
+	public static PguScene scene;
+	// current zoom value (if the value is less than 1, it will zoom out, greater than one, zoom in, otherwise, normal) 
+	public static float zoom = 1;
+	
+	
+	// USAGE:
+	// point1 -> the PguPoint from which the distance will be calculated
+	// point2 -> the other PguPoint
+	// returns the distance SQUARED between 2 points
+	// NOTE: this is faster than regular distance
+	public static float distanceSquared(PguPoint point1, PguPoint point2)
+	{
+		return (point1.x - point2.x) * (point1.x - point2.x) + (point1.y - point2.y) * (point1.y - point2.y);
+	}
+	
+	// USAGE:
+	// point1 -> the PguPoint from which the distance will be calculated
+	// point2 -> the other PguPoint
+	// returns the distance between 2 points
+	// NOTE: this is slower than the distanceSquared method
+	public static float distance(PguPoint point1, PguPoint point2)
+	{
+		return (float)Math.sqrt(distanceSquared(point1, point2));
+	}
+	
+	// USAGE:
+	// generates a text object based on the default font
+	public static PguText createDefaultText()
+	{
+		return new PguText("PGUFont.png", 8, 8, "abcdefghijklmnopqrstuvwxyz :,1234567890", new PguRectangle(0, 0, 32, 80));
+	}
 }

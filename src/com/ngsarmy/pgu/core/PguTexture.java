@@ -36,12 +36,14 @@ public class PguTexture
 	
 	public static PguTexture fromFile(String path)
 	{
+		if(_cache.containsKey(path)) return _cache.get(path);
+		
 		int dotPos = path.lastIndexOf('.');
 		PguTexture texture;
 		try
 		{
 			Texture slickTex = TextureLoader.getTexture(path.substring(dotPos + 1).toUpperCase(), ResourceLoader.getResourceAsStream("res/" + path));
-			slickTex.setTextureFilter(PguG.defaultTextureBlendingMode);
+			slickTex.setTextureFilter(PguG.DEFAULT_TEXTURE_BLENDING_MODE);
 			texture = new PguTexture(slickTex.getTextureID(), slickTex.getImageWidth(), slickTex.getImageHeight());
 			_cache.put(path, texture);
 			return texture;

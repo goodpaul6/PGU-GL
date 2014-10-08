@@ -1,7 +1,5 @@
 package com.ngsarmy.pgu.core;
 
-import com.ngsarmy.pgu.graphics.PguText;
-
 /* PguG class:
  * stores global values
  * and methods (but this is
@@ -58,12 +56,5 @@ public class PguG
 	public static float distance(PguPoint point1, PguPoint point2)
 	{
 		return (float)Math.sqrt(distanceSquared(point1, point2));
-	}
-	
-	// USAGE:
-	// generates a text object based on the default font
-	public static PguText createDefaultText()
-	{
-		return new PguText("PGUFont.png", 8, 8, "abcdefghijklmnopqrstuvwxyz :,1234567890", new PguRectangle(0, 0, 32, 80));
 	}
 }

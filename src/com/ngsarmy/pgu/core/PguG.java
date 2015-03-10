@@ -13,11 +13,9 @@ public class PguG
 	// the game engine host
 	public static PguGame game;
 	// width of the viewport
-	public static int width = 480;
+	public static int width = 800;
 	// height of the viewport
-	public static int height = 240;
-	// scale of the viewport
-	public static float scale = 2;
+	public static int height = 480;
 	// background color
 	public static PguColor bgColor = new PguColor();
 	// volume (this affects the volume of both music and sound effects)
@@ -56,5 +54,19 @@ public class PguG
 	public static float distance(PguPoint point1, PguPoint point2)
 	{
 		return (float)Math.sqrt(distanceSquared(point1, point2));
+	}
+
+	// USAGE:
+	// get the scaled width of the screen
+	public static int getWidth()
+	{
+		return (int)(width / zoom);
+	}
+	
+	// USAGE:
+	// get the scaled height of the screen
+	public static int getHeight()
+	{
+		return (int)(height / zoom);
 	}
 }

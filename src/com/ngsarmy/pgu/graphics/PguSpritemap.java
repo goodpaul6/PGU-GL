@@ -42,6 +42,31 @@ public class PguSpritemap extends PguImage
 	private int _frame;
 	private float _timer;
 	
+	public PguSpritemap(String source, int frameWidth, int frameHeight, PguRectangle src)
+	{
+		super(source);
+		complete = true;
+		rate = 1;
+		
+		_anims = new HashMap<String, PguAnimation>();
+		_timer = _frame = 0;
+		
+		reverse = false;
+		
+		_rectangle = new PguRectangle(0, 0, frameWidth, frameHeight);
+		
+		_width = super.getWidth();
+		_height = super.getHeight();
+		
+		if(frameWidth == 0) _rectangle.w = _width;
+		if(frameHeight == 0) _rectangle.h = _height;
+
+		_columns = (int)Math.ceil(_texture.getWidth() / _width);
+		_rows = (int)Math.ceil(_texture.getHeight() / _height);
+		
+		_frameCount = _columns * _rows;
+	}
+	
 	public PguSpritemap(String source, int frameWidth, int frameHeight)
 	{
 		super(source);
@@ -61,8 +86,8 @@ public class PguSpritemap extends PguImage
 		if(frameWidth == 0) _rectangle.w = _width;
 		if(frameHeight == 0) _rectangle.h = _height;
 	
-		_columns = (int)Math.ceil(_width / _rectangle.w);
-		_rows = (int)Math.ceil(_height / _rectangle.h);
+		_columns = (int)Math.ceil(_texture.getWidth() / _width);
+		_rows = (int)Math.ceil(_texture.getHeight() / _height);
 		
 		_frameCount = _columns * _rows;
 	}
@@ -93,8 +118,17 @@ public class PguSpritemap extends PguImage
 					}
 				}
 				if(_anim != null) _frame = (int)_anim.frames[_index];
+				updateRect();
 			}
 		}
+	}
+	
+	private void updateRect()
+	{
+		_rectangle.x = (_frame % _columns) * _width;
+		_rectangle.y = (_frame / _columns) * _height;
+		_rectangle.w = _width;
+		_rectangle.h = _height;
 	}
 	
 	// USAGE:
@@ -118,6 +152,7 @@ public class PguSpritemap extends PguImage
 			frames[i] %= _frameCount;
 			if(frames[i] < 0) frames[i] += _frameCount;
 		}
+		
 		PguAnimation anim = new PguAnimation(name, frames, frameRate, loop, this);
 		_anims.put(name, anim);
 		return anim;
@@ -147,6 +182,27 @@ public class PguSpritemap extends PguImage
 		restart();
 		
 		return _anim;
+	}
+	
+	// USAGE:
+	// plays a set of frames as if you supplied an animation :)
+	// frames -> the set of frames to play
+	// frameRate -> the frame rate at which to play the frames
+	// loop -> whether to loop these animations
+	// reset -> whether to reset the current animation 
+	// reverse -> whether to play the animation in reverse
+	public PguAnimation playFrames(int[] frames, float frameRate, boolean loop, boolean reset, boolean reverse)
+	{
+		if(frames == null || frames.length == 0)
+		{
+			stop(reset);		
+			return null;
+		}
+
+		if(reset == false && _anim != null && _anim.frames == frames)
+			return _anim;
+
+		return playAnimation(new PguAnimation(null, frames, frameRate, loop, this), reset, reverse);
 	}
 	
 	// USAGE:
@@ -180,6 +236,7 @@ public class PguSpritemap extends PguImage
 		_timer = _index = reverse ? _anim.frames.length - 1 : 0;
 		_frame = _anim.frames[_index];
 		complete = false;
+		updateRect();
 	}
 	
 	// USAGE:
@@ -193,6 +250,7 @@ public class PguSpritemap extends PguImage
 			_frame = _index = reverse ? _anim.frames.length - 1 : 0;
 		
 		complete = true;
+		updateRect();
 	}
 	
 	// USAGE:

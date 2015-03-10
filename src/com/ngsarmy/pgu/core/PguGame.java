@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.openal.SoundStore;
 
-import com.ngsarmy.pgu.template.GameScene;
+import com.ngsarmy.pgu.template.MainScene;
 import com.ngsarmy.pgu.utils.PguInput;
 
 /* PguGame class:
@@ -38,7 +39,7 @@ public class PguGame
 	{
 		try
 		{
-			Display.setDisplayMode(new DisplayMode((int)(PguG.width * PguG.scale), (int)(PguG.height * PguG.scale)));
+			Display.setDisplayMode(new DisplayMode((int)(PguG.width), (int)(PguG.height)));
 			Display.setVSyncEnabled(PguG.ENABLE_VSYNC);
 			Display.create();
 		}
@@ -97,10 +98,12 @@ public class PguGame
 				frames = 0;
 				timer = System.currentTimeMillis();
 			}
-			
+
 			Display.update();
+			SoundStore.get().poll(0);
 		}
 		
+		AL.destroy();
 		Display.destroy();
 	}
 	
@@ -188,12 +191,11 @@ public class PguGame
 		pushScene(scene);
 	}
 	
-	// MAIN METHOD:
-	// here is where the game class is created and the initial state is loaded
 	public static void main(String[] args)
 	{
 		PguGame game = new PguGame();
-		game.pushScene(new GameScene());
+		game.pushScene(new MainScene());
 		game.run();
+		
 	}
 }

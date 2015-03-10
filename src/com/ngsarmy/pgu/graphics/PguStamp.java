@@ -2,6 +2,7 @@ package com.ngsarmy.pgu.graphics;
 
 import org.lwjgl.opengl.GL11;
 
+import com.ngsarmy.pgu.core.PguG;
 import com.ngsarmy.pgu.core.PguGraphic;
 import com.ngsarmy.pgu.core.PguPoint;
 import com.ngsarmy.pgu.core.PguRectangle;
@@ -52,6 +53,9 @@ public class PguStamp extends PguGraphic
 		_texture.bind();
 		
 		GL11.glLoadIdentity();
+		
+		
+		GL11.glScalef(PguG.zoom, PguG.zoom, 0);	
 		
 		GL11.glColor4f(1, 1, 1, 1);
 		

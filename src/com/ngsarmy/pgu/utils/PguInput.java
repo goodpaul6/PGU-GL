@@ -19,10 +19,10 @@ import com.ngsarmy.pgu.core.PguG;
  */
 public class PguInput 
 {
-	private static boolean[] _prevKeys = new boolean[Keyboard.getKeyCount()];
+	private static boolean[] _prevKeys = new boolean[256];
 	private static boolean[] _prevMouseButtons = new boolean[Mouse.getButtonCount()];
 	
-	private static boolean[] _keys = new boolean[Keyboard.getKeyCount()];
+	private static boolean[] _keys = new boolean[256];
 	private static boolean[] _mouseButtons = new boolean[Mouse.getButtonCount()];
 	
 	// WARNING: DO NOT CALL, CALLED INTERNALLY
@@ -109,28 +109,28 @@ public class PguInput
 	// returns the x position of the mouse relative to the games width and height (unscaled)
 	public static float getMouseX()
 	{
-		return (Mouse.getX() / PguG.scale);
+		return (Mouse.getX() / PguG.zoom);
 	}
 
 	// USAGE:
 	// returns the y position of the mouse relative to the games width and height (unscaled)
 	public static float getMouseY()
 	{
-		return (Mouse.getY() / PguG.scale);
+		return (Mouse.getY() / PguG.zoom);
 	}
 	
 	// USAGE:
 	// returns the delta x amount of the mouse (the amount the mouse moved in the x axis since the last frame) (unscaled)
 	public static float getMouseDx()
 	{
-		return (Mouse.getDX() / PguG.scale);
+		return (Mouse.getDX() / PguG.zoom);
 	}
 	
 	// USAGE:
 	// returns the delta y amount of the mouse (the amount the mouse moved in the y axis since the last frame) (unscaled)
 	public static float getMouseDy()
 	{
-		return (Mouse.getDY() / PguG.scale);
+		return (Mouse.getDY() / PguG.zoom);
 	}
 	
 	// USAGE:
@@ -145,5 +145,19 @@ public class PguInput
 	public static int getMouseYScaled()
 	{
 		return Mouse.getY();
-	} 
+	}
+	
+	// USAGE:
+	// returns the delta x of the mouse relative to the games width and height (scaled)
+	public static int getMouseDxScaled()
+	{
+		return Mouse.getDX();
+	}
+	
+	// USAGE:
+	// returns the delta x of the mouse relative to the games width and height (scaled)
+	public static int getMouseDyScaled()
+	{
+		return Mouse.getDY();
+	}
 }

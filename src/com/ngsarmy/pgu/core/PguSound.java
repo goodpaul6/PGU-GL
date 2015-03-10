@@ -15,8 +15,7 @@ import org.newdawn.slick.util.ResourceLoader;
  * (supports .wav and .aif
  * formats at the moment)
  * 
- * WARNING: Do not call
- * constructor yourself
+ * (DO NOT CALL CONSTRUCTOR YOURSELF)
  * 
  * NOTE: This can techinally
  * play music too, but do

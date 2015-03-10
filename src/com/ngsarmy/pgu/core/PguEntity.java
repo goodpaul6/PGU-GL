@@ -167,14 +167,8 @@ public class PguEntity
 		{
 			PguEntity ent = _cacheEnts.get(i);
 			
-			if(ent.collidable && ent != this &&
-					x - hitbox.x + hitbox.w > ent.x - ent.hitbox.x &&
-					y - hitbox.y + hitbox.y > ent.y - ent.hitbox.y &&
-					x - hitbox.x < ent.x - ent.hitbox.x + ent.hitbox.w &&
-					y - hitbox.y < ent.y - ent.hitbox.y + ent.hitbox.h)
-			{
+			if(collideWith(ent, x, y))
 				return ent;
-			}
 		}
 		
 		return null;
@@ -205,15 +199,15 @@ public class PguEntity
 	// x -> the virtual x position to place this entity (the x position where it will check collision)
 	// y -> the virtual y position to place this entity (the y position where it will check collision)
 	// returns the entity if you are colliding with it, otherwise null
-	public PguEntity collideWith(PguEntity ent, float x, float y)
+	public boolean collideWith(PguEntity ent, float x, float y)
 	{
 		if(collidable && ent.collidable &&
-				x - hitbox.x + hitbox.w > ent.x - ent.hitbox.x &&
-				y - hitbox.y + hitbox.y > ent.y - ent.hitbox.y &&
-				x - hitbox.x < ent.x - ent.hitbox.x + ent.hitbox.w &&
-				y - hitbox.y < ent.y - ent.hitbox.y + ent.hitbox.h)
-			return ent;
-		return null;
+				x + hitbox.x + hitbox.w > ent.x + ent.hitbox.x &&
+				y + hitbox.y + hitbox.h > ent.y + ent.hitbox.y &&
+				x + hitbox.x < ent.x + ent.hitbox.x + ent.hitbox.w &&
+				y + hitbox.y < ent.y + ent.hitbox.y + ent.hitbox.h)
+			return true;
+		return false;
 	}
 	
 	// USAGE:
@@ -224,10 +218,10 @@ public class PguEntity
 	// returns true if there is an overlap and false if there isn't
 	public boolean collideRect(PguRectangle rect, float x, float y)
 	{
-		if(x - hitbox.x + hitbox.w > rect.x && 
-			y - hitbox.y + hitbox.h > rect.y &&
-			x - hitbox.x <= rect.x + rect.w &&
-			y - hitbox.y <= rect.y + rect.h)
+		if(x + hitbox.x + hitbox.w > rect.x && 
+			y + hitbox.y + hitbox.h > rect.y &&
+			x + hitbox.x <= rect.x + rect.w &&
+			y + hitbox.y <= rect.y + rect.h)
 			return true;
 		return false;
 	}
@@ -295,7 +289,7 @@ public class PguEntity
 	// x -> amount to move by in the x axis
 	// y -> amount to move by in the y axis
 	// sweep -> whether to skip the low-res collision check and do the high res check anyways
-	public void modeBy(String type, float x, float y, boolean sweep)
+	public void moveBy(String type, float x, float y, boolean sweep)
 	{
 		if(x != 0)
 		{

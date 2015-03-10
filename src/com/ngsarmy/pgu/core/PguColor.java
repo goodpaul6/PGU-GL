@@ -29,6 +29,17 @@ public class PguColor
 		this.a = a;
 	}
 	
+	
+	// USAGE:
+	// set the color values
+	public void set(int r, int g, int b, int a)
+	{
+		this.r = r;
+		this.g = g;
+		this.b = b;
+		this.a = a;
+	}
+	
 	// USAGE:
 	// convert from PguColor to AARRGGBB hex integer
 	public int toHexARGB()

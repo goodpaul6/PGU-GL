@@ -21,6 +21,7 @@ public class PguScene
 	private HashMap<Integer, ArrayList<PguEntity>> _entities;
 	private HashMap<Integer, ArrayList<PguEntity>> _add;
 	private ArrayList<PguEntity> _remove;
+	private boolean _removeAll;
 	
 	public PguScene()
 	{
@@ -28,6 +29,7 @@ public class PguScene
 		_entities = new HashMap<Integer, ArrayList<PguEntity>>();
 		_add = new HashMap<Integer, ArrayList<PguEntity>>();
 		_remove = new ArrayList<PguEntity>();
+		_removeAll = false;
 	}
 	
 	// USAGE:
@@ -162,11 +164,7 @@ public class PguScene
 	// removes all of the entities in the scene
 	public void removeAll()
 	{
-		for(ArrayList<PguEntity> ents : _entities.values())
-		{
-			for(int i = 0; i < ents.size(); i++)
-				remove(ents.get(i));
-		}
+		_removeAll = true;
 	}
 	
 	// USAGE:
@@ -217,6 +215,14 @@ public class PguScene
 	// DANGER: INTERNAL METHOD, DO NOT CALL DIRECTLY
 	public void applyChanges()
 	{
+		if(_removeAll)
+		{
+			_remove.clear();
+			_entities.clear();
+			
+			_removeAll = false;
+		}
+		
 		for(Map.Entry<Integer, ArrayList<PguEntity>> entSet : _add.entrySet())
 		{
 			for(int i = 0; i < entSet.getValue().size(); i++)

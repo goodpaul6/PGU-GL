@@ -3,6 +3,7 @@ package com.ngsarmy.pgu.graphics;
 import org.lwjgl.opengl.GL11;
 
 import com.ngsarmy.pgu.core.PguColor;
+import com.ngsarmy.pgu.core.PguG;
 import com.ngsarmy.pgu.core.PguGraphic;
 import com.ngsarmy.pgu.core.PguPoint;
 import com.ngsarmy.pgu.core.PguRectangle;
@@ -49,7 +50,7 @@ public class PguImage extends PguGraphic
 	public PguColor color;
 	
 	// internal texture
-	private PguTexture _texture;
+	protected PguTexture _texture;
 	
 	// internal rectangle
 	protected PguRectangle _rectangle;
@@ -82,8 +83,8 @@ public class PguImage extends PguGraphic
 	@Override
 	public void render(PguPoint point, PguPoint camera)
 	{
-		_point.x = (relative ? point.x : 0) + x - originX - camera.x * scrollX;
-		_point.y = (relative ? point.y : 0) + y - originY - camera.y * scrollY;
+		_point.x = point.x + x - camera.x * scrollX;
+		_point.y = point.y + y - camera.y * scrollY;
 		
 		if(_texture != null)
 		{
@@ -95,20 +96,24 @@ public class PguImage extends PguGraphic
 			GL11.glRotatef(angle, 0, 0, 1);
 			GL11.glTranslatef(-originX, -originY, 0);
 			
-			GL11.glScalef(scaleX * scale, scaleY * scale, 0);
+			GL11.glScalef(scaleX * scale * PguG.zoom, scaleY * scale * PguG.zoom, 1);
 			
 			GL11.glColor4f(color.fR(), color.fG(), color.fB(), color.fA());
 			
-			GL11.glBegin(GL11.GL_QUADS);
-			GL11.glTexCoord2f(_rectangle.x / _texture.getWidth(), _rectangle.y / _texture.getHeight());
-			GL11.glVertex2f(0, 0);
-			GL11.glTexCoord2f((_rectangle.x + _rectangle.w) / _texture.getWidth(), _rectangle.y / _texture.getHeight());
-			GL11.glVertex2f(_rectangle.w, 0);
-			GL11.glTexCoord2f((_rectangle.x + _rectangle.w) / _texture.getWidth(), (_rectangle.y + _rectangle.h) / _texture.getHeight());
-			GL11.glVertex2f(_rectangle.w, _rectangle.h);
-			GL11.glTexCoord2f(_rectangle.x / _texture.getWidth(), (_rectangle.y + _rectangle.h) / _texture.getHeight());
-			GL11.glVertex2f(0, _rectangle.h);
-			GL11.glEnd();
+//			GL11.glBegin(GL11.GL_TRIANGLES);
+//			GL11.glTexCoord2f(_rectangle.x / _texture.getWidth(), _rectangle.y / _texture.getHeight());
+//			GL11.glVertex2f(0, 0);
+//			GL11.glTexCoord2f((_rectangle.x + _rectangle.w) / _texture.getWidth(), _rectangle.y / _texture.getHeight());
+//			GL11.glVertex2f(_rectangle.w, 0);
+//			GL11.glTexCoord2f((_rectangle.x + _rectangle.w) / _texture.getWidth(), (_rectangle.y + _rectangle.h) / _texture.getHeight());
+//			GL11.glVertex2f(_rectangle.w, _rectangle.h);
+//			GL11.glTexCoord2f(_rectangle.x / _texture.getWidth(), (_rectangle.y + _rectangle.h) / _texture.getHeight());
+//			GL11.glVertex2f(0, _rectangle.h);
+//			GL11.glEnd();
+			
+			PguUtils.renderQuad(0, 0, _rectangle.w, _rectangle.h, 
+					_rectangle.x / _texture.getWidth(), (_rectangle.x + _rectangle.w) / _texture.getWidth(), 
+					_rectangle.y / _texture.getHeight(), (_rectangle.y + _rectangle.h) / _texture.getHeight());
 			
 			PguUtils.unbindTexture();
 		}
